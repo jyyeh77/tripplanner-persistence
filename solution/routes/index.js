@@ -20,4 +20,6 @@ router.get('/', function(req, res, next) {
   .catch(next);
 });
 
+router.use(require('./api/attractions'));
+
 module.exports = router;

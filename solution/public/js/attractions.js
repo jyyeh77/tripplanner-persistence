@@ -9,13 +9,43 @@
 
 var attractionsModule = (function () {
 
+var enhanced = {};
   // application state
+var restaurants, hotels, activities
+  $.ajax({
+      method: 'GET',
+      url: '/api/restaurants'
+    })
+    .then(function(foundRestaurants) {
+      restaurants = foundRestaurants;
+      enhanced.restaurants = restaurants.map(attractionModule.create)
+    })
+    .catch(function(err){
+      console.log(err);
+    })
+  $.ajax({
+      method: 'GET',
+      url: '/api/activities'
+    })
+    .then(function(foundActivities) {
+      activities = foundActivities;
+      enhanced.activities = activities.map(attractionModule.create)
+    })
+    .catch(function(err){
+      console.log(err);
+    })
+  $.ajax({
+      method: 'GET',
+      url: '/api/hotels'
+    })
+    .then(function(foundHotels) {
+      hotels = foundHotels;
+      enhanced.hotels = hotels.map(attractionModule.create)
+    })
+    .catch(function(err){
+      console.log(err)
+    })
 
-  var enhanced = {
-    hotels: hotels.map(attractionModule.create),
-    restaurants: restaurants.map(attractionModule.create),
-    activities: activities.map(attractionModule.create),
-  }
 
   // private helper methods (only available inside the module)
 

@@ -18,9 +18,38 @@ $(function(){
   var $activitySelect = $optionsPanel.find('#activity-choices');
 
   // make all the option tags (second arg of `forEach` is a `this` binding)
-  hotels.forEach(makeOption, $hotelSelect);
-  restaurants.forEach(makeOption, $restaurantSelect);
-  activities.forEach(makeOption, $activitySelect);
+  $.ajax({
+      method: 'GET',
+      url: '/api/restaurants'
+    })
+    .then(function(foundRestaurants) {
+      foundRestaurants.forEach(makeOption, $restaurantSelect);
+    })
+    .catch(function(err){
+      console.log(err);
+    })
+
+  $.ajax({
+      method: 'GET',
+      url: '/api/activities'
+    })
+    .then(function(foundActivities) {
+      foundActivities.forEach(makeOption, $activitySelect);
+    })
+    .catch(function(err){
+      console.log(err);
+    })
+
+  $.ajax({
+      method: 'GET',
+      url: '/api/hotels'
+    })
+    .then(function(foundHotels) {
+      foundHotels.forEach(makeOption, $hotelSelect);
+    })
+    .catch(function(err){
+      console.log(err);
+    })
 
   function makeOption (databaseAttraction) {
     var $option = $('<option></option>') // makes a new option tag

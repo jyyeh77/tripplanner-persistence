@@ -19,7 +19,8 @@ var tripModule = (function () {
 
   // application state
 
-  var days = [],
+  var publicAPI;
+	var days = [],
       currentDay;
 
   // jQuery selections
@@ -48,6 +49,18 @@ var tripModule = (function () {
   function addDay () {
     if (this && this.blur) this.blur(); // removes focus box from buttons
     var newDay = dayModule.create({ number: days.length + 1 }); // dayModule
+
+	  $.ajax({
+	  	method: 'POST',
+		  url: '/api/days/' + newDay.number
+		  })
+		  .then(function(postedDay){
+		  	newDay.id = postedDay.id;
+		  	console.log("Successful post!");
+		  })
+		  .catch(function(err){
+		  	console.log(err);
+		  })
     days.push(newDay);
     if (days.length === 1) {
       currentDay = newDay;
@@ -58,6 +71,17 @@ var tripModule = (function () {
   function deleteCurrentDay () {
     // prevent deleting last day
     if (days.length < 2 || !currentDay) return;
+
+	  $.ajax({
+	  	method: 'GET',
+		  url: '/api/days/' + currentDay.id
+	  })
+		  .then(function(deletedDay){
+		  	console.log("Day is destroyed")
+		  })
+		  .catch(function(err){
+		  	console.log(err);
+		  })
     // remove from the collection
     var index = days.indexOf(currentDay),
       previousDay = days.splice(index, 1)[0],
@@ -72,24 +96,37 @@ var tripModule = (function () {
 
   // globally accessible module methods
 
-  var publicAPI = {
+	publicAPI = {
 
-    load: function () {
-      $(addDay);
-    },
 
-    switchTo: switchTo,
+		load: function () {
+			$.ajax({
+				method: 'GET',
+				url: '/api/days'
+			})
+				.then(function (foundDays) {
+					if (foundDays.length === 0) $(addDay);
+					console.log("Ajax is inside of days");
+				})
+				.catch(function (err) {
+					console.log(err);
+				})
 
-    addToCurrent: function (attraction) {
-      currentDay.addAttraction(attraction);
-    },
+			// $(addDay);
+		},
 
-    removeFromCurrent: function (attraction) {
-      currentDay.removeAttraction(attraction);
-    }
+		switchTo: switchTo,
 
-  };
+		addToCurrent: function (attraction) {
+			currentDay.addAttraction(attraction);
+		},
 
-  return publicAPI;
+		removeFromCurrent: function (attraction) {
+			currentDay.removeAttraction(attraction);
+		}
+
+	};
+
+	return publicAPI;
 
 }());

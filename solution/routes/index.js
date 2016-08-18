@@ -4,6 +4,7 @@ var Hotel = require('../models/hotel');
 var Restaurant = require('../models/restaurant');
 var Activity = require('../models/activity');
 
+// still needed to render webpage
 router.get('/', function(req, res, next) {
   Promise.all([
     Hotel.findAll(),
@@ -20,6 +21,8 @@ router.get('/', function(req, res, next) {
   .catch(next);
 });
 
+// AJAX routing upon ajax get request
 router.use(require('./api/attractions'));
+router.use(require('./api/days'));
 
 module.exports = router;

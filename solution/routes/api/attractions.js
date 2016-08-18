@@ -5,7 +5,7 @@ var Restaurant = require('../../models/restaurant');
 var Activity = require('../../models/activity');
 
 
-// send db data through ajax
+// retrieve hotel db data through ajax (on front end in options.js)
 router.get('/api/hotels', function(req, res, next) {
 	Hotel.findAll()
 		.then(function(hotels){

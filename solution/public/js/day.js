@@ -54,6 +54,14 @@ var dayModule = (function () {
     this.$button.on('click', function (){
       this.blur(); // removes focus box from buttons
       tripModule.switchTo(self);
+      console.log(self.id)
+      $.ajax({
+        method: 'GET',
+        url: '/api/days/render/' + self.id.toString()
+      })
+      .then(function(){
+        console.log('click ajax succesful')
+      })
     });
     return this;
   };

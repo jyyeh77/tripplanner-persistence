@@ -35,6 +35,16 @@ router.get('/api/days/:id', function(req, res, next){
 			})
 })
 
+router.get('/api/days/render/:id', function(req,res,next) {
+	Day.findById(req.params.id)
+	.then(function(foundDay){
+		console.log(foundDay.number)
+	})
+	.then(function(foundHotel) {
+		console.log(foundHotel.name)
+	})
+})
+
 // to intercept ajax GET request from front end to retrieve all Days in Sequelize DB
 router.get('/api/days', function(req, res, next){
 	Day.findAll()

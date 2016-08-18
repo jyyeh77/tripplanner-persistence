@@ -106,13 +106,17 @@ var tripModule = (function () {
 			})
 				.then(function (foundDays) {
 					if (foundDays.length === 0) $(addDay);
-					console.log("Ajax is inside of days");
+					else {
+            foundDays.forEach(function(foundDay){
+              days.push(dayModule.create(foundDay));
+            })
+            console.log(days)
+            switchTo(days[0])
+          }
 				})
 				.catch(function (err) {
 					console.log(err);
 				})
-
-			// $(addDay);
 		},
 
 		switchTo: switchTo,

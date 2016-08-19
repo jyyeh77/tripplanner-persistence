@@ -34,34 +34,44 @@ var dayModule = (function() {
     // for days based on existing data
     utilsModule.merge(data, this);
 
-	  $.ajax({
-		  method: "GET",
-		  url: '/api/days/gethotel/' + this.hotelId
-	  })
-		  .then(function(foundHotel){
-	  	  console.log("Ajax get request successful, retrieved hotel...", foundHotel.name);
-	  	  this.hotel = foundHotel;
-			  console.log("Our hotel is now: ", this.hotel);
-			  if (this.hotel) {
-				  console.log("Detects existing hotel: ", this.hotel.name);
-				  this.hotel = attractionsModule.getEnhanced(this.hotel);
-				  function show(attraction) {
-					  attraction.show();
-				  }
+    $.ajax({
+        method: "GET",
+        url: '/api/days/gethotel/' + this.hotelId
+      })
+      .then(function(foundHotel) {
+        console.log("Ajax get request successful, retrieved hotel...", foundHotel.name);
+        this.hotel = foundHotel;
+        console.log("Our hotel is now: ", this.hotel);
+        if (this.hotel) {
+          console.log("Detects existing hotel: ", this.hotel.name);
+          this.hotel = attractionsModule.getEnhanced(this.hotel);
 
-				  if (this.hotel) {
-					  console.log("Showing hotels!");
-					  show(this.hotel);
-				  }
-			  }
-	  })
-	    .catch(function(err){
-	    	console.log(err);
-	  })
+          function show(attraction) {
+            attraction.show();
+          }
 
+          if (this.hotel) {
+            console.log("Showing hotels!");
+            show(this.hotel);
+          }
+        }
+      })
+      .catch(function(err) {
+        console.log(err);
+      })
+      $.ajax({
+        method: "GET",
+        url: '/api/days/getrestaurants/' + this.id
+      })
+      .then(function(){
+        console.log('request succesful')
+      })
+      .catch(function(err){
+        console.log(err)
+      });
     // if (this.hotel) {
-	  	// console.log("Detects existing hotel: ", this.hotel.name);
-	  	// this.hotel = attractionsModule.getEnhanced(this.hotel);
+    // console.log("Detects existing hotel: ", this.hotel.name);
+    // this.hotel = attractionsModule.getEnhanced(this.hotel);
     // }
     // this.restaurants = this.restaurants.map(attractionsModule.getEnhanced);
     // this.activities = this.activities.map(attractionsModule.getEnhanced);
@@ -115,7 +125,7 @@ var dayModule = (function() {
   Day.prototype.show = function() {
     // day UI
     this.$button.addClass('current-day');
-	  console.log("Showing Day Number...", this.number);
+    console.log("Showing Day Number...", this.number);
     $dayTitle.text('Day ' + this.number);
     // attractions UI
     function show(attraction) {
@@ -123,8 +133,8 @@ var dayModule = (function() {
     }
 
     if (this.hotel) {
-    	console.log("Showing hotels!");
-    	show(this.hotel);
+      console.log("Showing hotels!");
+      show(this.hotel);
     }
     this.restaurants.forEach(show);
     this.activities.forEach(show);
@@ -149,12 +159,13 @@ var dayModule = (function() {
     // adding to the day object
     switch (attraction.type) {
       case 'hotel':
-      console.log(attraction.id)
-	      // makes put request to server to associate hotel with select day
+          // makes put request to server to associate hotel with select day
         $.ajax({
             method: 'PUT',
             url: '/api/days/addhotel/' + this.id,
-            data: {hotelId: attraction.id}
+            data: {
+              hotelId: attraction.id
+            }
           })
           .then(function() {
             console.log('click ajax successful')
@@ -182,7 +193,17 @@ var dayModule = (function() {
     // removing from the day object
     switch (attraction.type) {
       case 'hotel':
-        this.hotel = null;
+        $.ajax({
+          method: "DELETE",
+          url: "api/days/removehotel/" + this.id
+        })
+        .then(function(){
+          console.log('ajax success')
+          this.hotel = null;
+        })
+        .catch(function(err){
+          console.log(err)
+        })
         break;
       case 'restaurant':
         utilsModule.remove(this.restaurants, attraction);

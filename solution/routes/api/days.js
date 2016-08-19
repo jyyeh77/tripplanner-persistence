@@ -14,15 +14,39 @@ router.get('/api/days/gethotel/:hotelId', function(req, res, next){
 		.catch(next);
 })
 
+router.get('/api/days/getrestaurants/:id', function(req, res, next){
+	Day.findById(req.params.id)
+	.then(function(foundDay){
+		return foundDay.findAll({
+			include: [Restaurant]
+		})
+	})
+	.then(function(foundRestaurants){
+		console.log(foundRestaurants)
+	})
+	.catch(next)
+})
+
 router.put('/api/days/addhotel/:id', function(req, res, next) {
 	Day.findById(req.params.id)
 		.then(function(foundDay) {
-			console.log("found day" + foundDay.number)
-			console.log(req.body.hotelId)
 			return foundDay.setHotel(req.body.hotelId)
 		})
 		.then(function() {
 			res.end();
+		})
+		.catch(next)
+})
+
+router.delete('/api/days/removehotel/:id', function(req, res, next) {
+	Day.findById(req.params.id)
+		.then(function(foundDay) {
+			console.log("Found day numbah:" + foundDay.number)
+			foundDay.setHotel(null).then(function() {
+				console.log(foundDay.hotelId)
+				res.end();
+			})
+
 		})
 		.catch(next)
 })

@@ -13,19 +13,19 @@
  * This module has one public method: `.create()`, used by `days.js`.
  */
 
-var dayModule = (function () {
+var dayModule = (function() {
 
   // jQuery selections
 
   var $dayButtons, $dayTitle;
-  $(function () {
+  $(function() {
     $dayButtons = $('.day-buttons');
     $dayTitle = $('#day-title > span');
   });
 
   // Day class and setup
 
-  function Day (data) {
+  function Day(data) {
     // for brand-new days
     this.number = 0;
     this.hotel = null;
@@ -42,62 +42,66 @@ var dayModule = (function () {
 
   // automatic day button handling
 
-  Day.prototype.setNumber = function (num) {
+  Day.prototype.setNumber = function(num) {
     this.number = num;
     this.$button.text(num);
   };
 
-  Day.prototype.buildButton = function () {
+  Day.prototype.buildButton = function() {
     this.$button = $('<button class="btn btn-circle day-btn"></button>')
       .text(this.number);
     var self = this;
-    this.$button.on('click', function (){
+    this.$button.on('click', function() {
       this.blur(); // removes focus box from buttons
       tripModule.switchTo(self);
       console.log(self.id)
 
-	    // makes request to backend to
+      // makes request to backend to
       $.ajax({
-        method: 'GET',
-        url: '/api/days/render/' + self.id.toString()
-      })
-      .then(function(){
-        console.log('click ajax successful')
-      })
-	      .catch(function(err){
-	      	console.log(err);
-	      })
+          method: 'GET',
+          url: '/api/days/render/' + self.id.toString()
+        })
+        .then(function() {
+          console.log('click ajax successful')
+        })
+        .catch(function(err) {
+          console.log(err);
+        })
     });
     return this;
   };
 
-  Day.prototype.showButton = function () {
+  Day.prototype.showButton = function() {
     this.$button.appendTo($dayButtons);
     return this;
   };
 
-  Day.prototype.hideButton = function () {
+  Day.prototype.hideButton = function() {
     this.$button.detach(); // detach removes from DOM but not from memory
     return this;
   };
 
-  Day.prototype.show = function () {
+  Day.prototype.show = function() {
     // day UI
     this.$button.addClass('current-day');
     $dayTitle.text('Day ' + this.number);
     // attractions UI
-    function show (attraction) { attraction.show(); }
+    function show(attraction) {
+      attraction.show();
+    }
     if (this.hotel) show(this.hotel);
     this.restaurants.forEach(show);
     this.activities.forEach(show);
   };
 
-  Day.prototype.hide = function () {
+  Day.prototype.hide = function() {
     // day UI
     this.$button.removeClass('current-day');
     $dayTitle.text('Day not Loaded');
     // attractions UI
-    function hide (attraction) { attraction.hide(); }
+    function hide(attraction) {
+      attraction.hide();
+    }
     if (this.hotel) hide(this.hotel);
     this.restaurants.forEach(hide);
     this.activities.forEach(hide);
@@ -105,10 +109,22 @@ var dayModule = (function () {
 
   // day updating
 
-  Day.prototype.addAttraction = function (attraction) {
+  Day.prototype.addAttraction = function(attraction) {
     // adding to the day object
     switch (attraction.type) {
       case 'hotel':
+      console.log(attraction.id)
+        $.ajax({
+            method: 'PUT',
+            url: '/api/days/addhotel/' + this.id,
+            data: {hotelId: attraction.id}
+          })
+          .then(function() {
+            console.log('click ajax successful')
+          })
+          .catch(function(err) {
+            console.log(err);
+          })
         if (this.hotel) this.hotel.hide();
         this.hotel = attraction;
         break;
@@ -118,13 +134,14 @@ var dayModule = (function () {
       case 'activity':
         utilsModule.pushUnique(this.activities, attraction);
         break;
-      default: console.error('bad type:', attraction);
+      default:
+        console.error('bad type:', attraction);
     }
     // activating UI
     attraction.show();
   };
 
-  Day.prototype.removeAttraction = function (attraction) {
+  Day.prototype.removeAttraction = function(attraction) {
     // removing from the day object
     switch (attraction.type) {
       case 'hotel':
@@ -136,7 +153,8 @@ var dayModule = (function () {
       case 'activity':
         utilsModule.remove(this.activities, attraction);
         break;
-      default: console.error('bad type:', attraction);
+      default:
+        console.error('bad type:', attraction);
     }
     // deactivating UI
     attraction.hide();
@@ -146,7 +164,7 @@ var dayModule = (function () {
 
   var publicAPI = {
 
-    create: function (databaseDay) {
+    create: function(databaseDay) {
       return new Day(databaseDay);
     }
 

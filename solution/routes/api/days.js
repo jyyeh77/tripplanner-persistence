@@ -6,14 +6,25 @@ var Activity = require('../../models/activity');
 var Day = require('../../models/day');
 
 
-
+router.put('/api/days/addhotel/:id', function(req, res, next) {
+	Day.findById(req.params.id)
+		.then(function(foundDay) {
+			console.log("found day" + foundDay.number)
+			console.log(req.body.hotelId)
+			return foundDay.setHotel(req.body.hotelId)
+		})
+		.then(function() {
+			res.end();
+		})
+		.catch(next)
+})
 
 // adding a day via ajax request in trip.js addDay()
-router.post('/api/days/:number', function(req, res, next){
+router.post('/api/days/:number', function(req, res, next) {
 	Day.create({
-		number: req.params.number
-	})
-		.then(function(createdDay){
+			number: req.params.number
+		})
+		.then(function(createdDay) {
 			console.log("Created: Day " + createdDay.number);
 			res.send(createdDay);
 		})
@@ -21,36 +32,36 @@ router.post('/api/days/:number', function(req, res, next){
 })
 
 // deletes a day via ajax request in trip.js deleteDay()
-router.get('/api/days/:id', function(req, res, next){
+router.get('/api/days/:id', function(req, res, next) {
 	Day.findById(req.params.id)
-		.then(function(foundDay){
+		.then(function(foundDay) {
 			return foundDay.destroy();
 		})
-		.then(function(doneDay){
+		.then(function(doneDay) {
 			console.log("Day is destroyed in DB!");
 			res.end();
 		})
-			.catch(function(err){
-				console.log(err);
-			})
+		.catch(function(err) {
+			console.log(err);
+		})
 })
 
 // intercept AJAX request for rendering already entered day
-router.get('/api/days/render/:id', function(req,res,next) {
+router.get('/api/days/render/:id', function(req, res, next) {
 	Day.findById(req.params.id)
-	.then(function(foundDay){
-		console.log('Found Day number...', foundDay.number)
-		return foundDay.getHotel();
-	})
-	.then(function(foundHotel) {
-		console.log("Found hotel...", foundHotel);
-	})
+		.then(function(foundDay) {
+			console.log('Found Day number...', foundDay.number)
+			return foundDay.getHotel();
+		})
+		.then(function(foundHotel) {
+			console.log("Found hotel...", foundHotel);
+		})
 })
 
 // to intercept ajax GET request from front end to retrieve all Days in Sequelize DB
-router.get('/api/days', function(req, res, next){
+router.get('/api/days', function(req, res, next) {
 	Day.findAll()
-		.then(function(foundDays){
+		.then(function(foundDays) {
 			res.send(foundDays);
 		})
 		.catch(next);

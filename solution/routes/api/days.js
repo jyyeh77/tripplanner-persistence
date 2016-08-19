@@ -35,13 +35,15 @@ router.get('/api/days/:id', function(req, res, next){
 			})
 })
 
+// intercept AJAX request for rendering already entered day
 router.get('/api/days/render/:id', function(req,res,next) {
 	Day.findById(req.params.id)
 	.then(function(foundDay){
-		console.log(foundDay.number)
+		console.log('Found Day number...', foundDay.number)
+		return foundDay.getHotel();
 	})
 	.then(function(foundHotel) {
-		console.log(foundHotel.name)
+		console.log("Found hotel...", foundHotel);
 	})
 })
 

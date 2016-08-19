@@ -33,9 +33,40 @@ var dayModule = (function() {
     this.activities = [];
     // for days based on existing data
     utilsModule.merge(data, this);
-    if (this.hotel) this.hotel = attractionsModule.getEnhanced(this.hotel);
-    this.restaurants = this.restaurants.map(attractionsModule.getEnhanced);
-    this.activities = this.activities.map(attractionsModule.getEnhanced);
+
+	  $.ajax({
+		  method: "GET",
+		  url: '/api/days/gethotel/' + this.hotelId
+	  })
+		  .then(function(foundHotel){
+	  	  console.log("Ajax get request successful, retrieved hotel...", foundHotel.name);
+	  	  this.hotel = foundHotel;
+			  console.log("Our hotel is now: ", this.hotel);
+			  if (this.hotel) {
+				  console.log("Detects existing hotel: ", this.hotel.name);
+				  this.hotel = attractionsModule.getEnhanced(this.hotel);
+				  function show(attraction) {
+					  attraction.show();
+				  }
+
+				  if (this.hotel) {
+					  console.log("Showing hotels!");
+					  show(this.hotel);
+				  }
+			  }
+	  })
+	    .catch(function(err){
+	    	console.log(err);
+	  })
+
+    // if (this.hotel) {
+	  	// console.log("Detects existing hotel: ", this.hotel.name);
+	  	// this.hotel = attractionsModule.getEnhanced(this.hotel);
+    // }
+    // this.restaurants = this.restaurants.map(attractionsModule.getEnhanced);
+    // this.activities = this.activities.map(attractionsModule.getEnhanced);
+
+
     // remainder of constructor
     this.buildButton().showButton();
   }
@@ -56,7 +87,7 @@ var dayModule = (function() {
       tripModule.switchTo(self);
       console.log(self.id)
 
-      // makes request to backend to
+      // makes request to backend to save retrieve select day
       $.ajax({
           method: 'GET',
           url: '/api/days/render/' + self.id.toString()
@@ -84,12 +115,17 @@ var dayModule = (function() {
   Day.prototype.show = function() {
     // day UI
     this.$button.addClass('current-day');
+	  console.log("Showing Day Number...", this.number);
     $dayTitle.text('Day ' + this.number);
     // attractions UI
     function show(attraction) {
       attraction.show();
     }
-    if (this.hotel) show(this.hotel);
+
+    if (this.hotel) {
+    	console.log("Showing hotels!");
+    	show(this.hotel);
+    }
     this.restaurants.forEach(show);
     this.activities.forEach(show);
   };
@@ -114,6 +150,7 @@ var dayModule = (function() {
     switch (attraction.type) {
       case 'hotel':
       console.log(attraction.id)
+	      // makes put request to server to associate hotel with select day
         $.ajax({
             method: 'PUT',
             url: '/api/days/addhotel/' + this.id,

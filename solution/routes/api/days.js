@@ -5,6 +5,14 @@ var Restaurant = require('../../models/restaurant');
 var Activity = require('../../models/activity');
 var Day = require('../../models/day');
 
+router.get('/api/days/gethotel/:hotelId', function(req, res, next){
+	Hotel.findById(req.params.hotelId)
+		.then(function(foundHotel){
+			console.log("Found existing hotel...", foundHotel.name);
+			res.send(foundHotel);
+		})
+		.catch(next);
+})
 
 router.put('/api/days/addhotel/:id', function(req, res, next) {
 	Day.findById(req.params.id)
@@ -54,14 +62,18 @@ router.get('/api/days/render/:id', function(req, res, next) {
 			return foundDay.getHotel();
 		})
 		.then(function(foundHotel) {
-			console.log("Found hotel...", foundHotel);
+			console.log("Found hotel...", foundHotel.name);
+			res.end();
 		})
+		.catch(next);
 })
 
 // to intercept ajax GET request from front end to retrieve all Days in Sequelize DB
 router.get('/api/days', function(req, res, next) {
+	var foundHotels;
 	Day.findAll()
 		.then(function(foundDays) {
+			console.log("Finding all days...")
 			res.send(foundDays);
 		})
 		.catch(next);

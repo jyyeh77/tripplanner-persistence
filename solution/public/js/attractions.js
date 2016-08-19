@@ -70,6 +70,7 @@ var restaurants, hotels, activities
       var type = databaseAttraction.type;
       var id = databaseAttraction.id;
       var found = publicAPI.getByTypeAndId(type, id);
+	    console.log("type: ", type, "id: ", id, "found: ", found);
       if (found) return found;
       throw Error('enhanced version not found', databaseAttraction);
     }
